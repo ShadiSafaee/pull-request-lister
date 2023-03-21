@@ -34,8 +34,8 @@ export function getUrl(pr) {
 	return pr ? pr.html_url : "<missing>";
 }
 
-export function getReviewedStatus(pr) {
-	return pr ? pr.labels.some((l) => l.name === "reviewed") : false;
+export function doesLabelExist(pr, label) {
+	return pr ? pr.labels.some((l) => l.name === label) : false;
 }
 
 function getRepo(pr) {

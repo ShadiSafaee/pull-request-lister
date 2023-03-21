@@ -1,4 +1,4 @@
-import { buildPrByRepoAndAuthor, getPullRequests, getReviewedStatus, getUrl } from "./shared.js";
+import { buildPrByRepoAndAuthor, getPullRequests, doesLabelExist, getUrl } from "./shared.js";
 import repos from "./repos.json" assert { type: "json" };
 import authors from "./authors.json" assert { type: "json" };
 
@@ -14,12 +14,15 @@ function outputPrsByAuthor(prByRepoAndAuthor) {
 		.forEach((author) => {
 			let output = repos.map((repo) => ({
 				repo,
-				reviewed: getReviewedStatus(prByRepoAndAuthor[repo][author.githubUser]),
+				reviewRequested: doesLabelExist(prByRepoAndAuthor[repo][author.githubUser], 'review requested'),
+				reviewed: doesLabelExist(prByRepoAndAuthor[repo][author.githubUser], 'reviewed'),
 				url: getUrl(prByRepoAndAuthor[repo][author.githubUser]),
 			}));
 
+			let raisedPrs = output.filter(pr => pr.url !== '<missing>').length;
+
 			console.log();
-			console.log(`Pull Requests for ${author.name}`);
+			console.log(`Pull Requests for ${author.name} - ${raisedPrs}/${repos.length}`);
 			console.table(output);
 		});
 }
