@@ -13,7 +13,7 @@ async function run() {
 		authorsForSearch = findRequestedAuthor(argv.author, authors);
 	}
 
-	const prs = await getPullRequests(reposForSearch, authorsForSearch);
+	const prs = await getPullRequests(repos, authorsForSearch);
 	const prByRepoAndAuthor = buildPrByRepoAndAuthor(repos, prs);
 	outputPrsByAuthor(prByRepoAndAuthor);
 }
