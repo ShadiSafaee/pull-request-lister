@@ -1,15 +1,25 @@
+import yargs from 'yargs/yargs';
+import { hideBin } from 'yargs/helpers';
 import { buildPrByRepoAndAuthor, getPullRequests, doesLabelExist, getUrl } from "./shared.js";
+import { findRequestedRepo } from "./filters.js";
 import repos from './repos.json' assert { type: "json" };
 import authors from './authors.json' assert { type: "json" };
 
 async function run() {
-  const prs = await getPullRequests(repos, authors);
-  const prByRepoAndAuthor = buildPrByRepoAndAuthor(repos, prs);
+  const argv = yargs(hideBin(process.argv)).argv;
+
+	let reposForSearch = repos;
+	if(argv.repo) {
+		reposForSearch = findRequestedRepo(argv.repo, repos);
+	}
+
+  const prs = await getPullRequests(reposForSearch, authors);
+  const prByRepoAndAuthor = buildPrByRepoAndAuthor(reposForSearch, prs);
   outputPrsByRepo(prByRepoAndAuthor);
 }
 
 function outputPrsByRepo(prByRepoAndAuthor) {
-  repos.forEach(repo => {
+  Object.keys(prByRepoAndAuthor).forEach(repo => {
     let missingAuthors = authors.filter(author => !prByRepoAndAuthor[repo][author.githubUser]);
     let allPrs = authors
       .filter(author => !missingAuthors.includes(author))
